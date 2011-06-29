@@ -1,5 +1,5 @@
 # -*- encoding : utf-8 -*-
-class Authorizer
+class Authorizer < ApplicationController
   ##############################################################################
   # Authorizer
   #
@@ -23,11 +23,11 @@ class Authorizer
     current_user_id = get_current_user_id
 
     unless current_user_id.nil?
-      or_ = ObjectRole.find( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
+      or_ = ObjectRole.all( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
     end
 
     # Congratulations, you've been Authorized.
-    unless or_.nil?
+    unless or_.blank?
       ret = true
     end
 
@@ -51,11 +51,11 @@ class Authorizer
     current_user_id = get_current_user_id
 
     unless current_user_id.nil?
-      or_ = ObjectRole.find( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
+      or_ = ObjectRole.all( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
     end
 
     # This time, we want it to be nil.
-    if or_.nil? && !current_user_id.nil?
+    if or_.blank? && !current_user_id.nil?
       ObjectRole.create!( :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id, :role => "owner" )
     end
 
@@ -118,7 +118,8 @@ class Authorizer
     ret = nil
 
     begin
-      ret = current_user.id
+      session = UserSession.find
+      ret = session.user.id
     rescue
     end
 
