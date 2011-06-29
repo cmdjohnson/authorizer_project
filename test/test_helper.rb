@@ -36,5 +36,16 @@ class ActiveSupport::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
+  ##############################################################################
+  # authlogic
+  ##############################################################################
+  include Authlogic::TestCase
+
+  def setup_user
+    activate_authlogic
+    @user = Factory.create :user
+    UserSession.create(@user)
+  end
+  ##############################################################################
 end
 
