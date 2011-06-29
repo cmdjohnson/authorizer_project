@@ -1,13 +1,11 @@
 require 'test_helper'
 
 class PostTest < ActiveRecord::TestCase
-  
-  setup do
-    
+  def setup
+    @post = Factory.build :post
   end
-  
-  test 'something' do
-    assert true
+
+  def test_factory
+    assert @post.valid?, @post.errors.full_messages.inspect
   end
-  
 end

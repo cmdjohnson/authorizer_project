@@ -3,7 +3,7 @@ require 'test_helper'
 
 class AuthorizerTest < ActiveRecord::TestCase
   def setup
-    setup_user
+    #setup_user
     @object_role = Factory.create :object_role
   end
 
