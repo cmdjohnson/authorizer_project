@@ -18,7 +18,7 @@ class ObjectRole < ActiveRecord::Base
   # validations
   ##############################################################################
   
-  validates_presence_of :class_name, :object_reference, :user_id, :role
+  validates_presence_of :klazz_name, :object_reference, :user_id, :role
   validates_numericality_of :object_reference, :only_integer => true
   validates_inclusion_of :role, :in => ObjectRole.roles
 
