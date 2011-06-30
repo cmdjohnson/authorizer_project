@@ -8,6 +8,17 @@ class ObjectRole < ActiveRecord::Base
     [ "owner" ]
   end
 
+  # What ObjectRoles does this object have associated?
+  def self.find_all_by_object(object)
+    raise "Can only operate on ActiveRecord::Base objects." unless object.is_a?(ActiveRecord::Base)
+    raise "Can only operate on saved objects" if object.new_record?
+
+    klazz_name = object.class.to_s
+    object_reference = object.id
+
+    ObjectRole.find(:all, :conditions => { :klazz_name => klazz_name, :object_reference => object_reference } )
+  end
+
   ##############################################################################
   # associations
   ##############################################################################
