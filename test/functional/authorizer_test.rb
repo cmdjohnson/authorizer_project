@@ -12,11 +12,11 @@ class AuthorizerTest < ActionController::TestCase
   def test_trolololololol
     c = ObjectRole.count
     
-    assert_false Authorizer.is_authorized?(@post)
+    assert_false Authorizer::Base.is_authorized?(@post)
 
-    Authorizer.create_ownership(@post)
+    Authorizer::Base.create_ownership(@post)
 
-    assert Authorizer.is_authorized?(@post)
+    assert Authorizer::Base.is_authorized?(@post)
     assert_equal c + 1, ObjectRole.count
 
     o = ObjectRole.first
@@ -39,7 +39,7 @@ class AuthorizerTest < ActionController::TestCase
 
     objects = [ "Post" ]
 
-    Authorizer.create_brand_new_object_roles( :objects => objects, :user => @user )
+    Authorizer::Base.create_brand_new_object_roles( :objects => objects, :user => @user )
 
     assert_equal 6, ObjectRole.count # WHY 6?????????????????????????????????????????????????????????
     # I don't understand factory_girl sometimes.
