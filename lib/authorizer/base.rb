@@ -27,9 +27,7 @@ module Authorizer
       klazz_name = object.class.to_s
       object_reference = object.id
 
-      unless user.nil?
-        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => user.id } )
-      end
+      or_ = find_object_role(klazz_name, object_reference, user)
 
       # This time, we want it to be nil.
       if or_.nil? && !user.nil?
@@ -60,10 +58,8 @@ module Authorizer
       klazz_name = object.class.to_s
       object_reference = object.id
 
-      unless user.nil?
-        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => user.id } )
-      end
-
+      or_ = find_object_role(klazz_name, object_reference, user)
+        
       # Congratulations, you've been Authorized.
       unless or_.nil?
         ret = true
@@ -151,6 +147,14 @@ module Authorizer
     end
 
     protected
+
+    def self.find_object_role(klazz_name, object_reference, user)
+      unless user.nil?
+        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => user.id } )
+      end
+
+      or_
+    end
 
     def self.basic_check_fails?(options)
       ret = false

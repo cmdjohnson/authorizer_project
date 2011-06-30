@@ -53,6 +53,7 @@ class AuthorizerTest < ActionController::TestCase
   def test_authorize_a_user_to_have_access_to_an_object
     # Set up stuff
 
+
     # Invoke method
 
     # Check result
