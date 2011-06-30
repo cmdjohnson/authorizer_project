@@ -102,6 +102,47 @@ module Authorizer
     end
 
     ############################################################################
+    # find
+    ############################################################################
+    # Out of the collection of all Posts, return the subset that belongs to the current user.
+    ############################################################################
+
+    def self.find(mode, klazz_name)
+      # rrrr
+      ret = nil
+      # Checks
+      raise "Mode must be one of [ :all, :first ]" unless [ :all, :first ].include?(mode)
+      # Get the real klazz
+      klazz = nil
+      # Check it
+      begin
+        klazz = eval(klazz_name)
+      rescue
+      end
+      # oooo ooo ooo ___ --- === __- --_- ++_+_ =--- +- =+=-=- =-=    <--- ice beam!
+      unless klazz.nil?
+        # now we know klazz really exists.
+        # let's find the object_role objects that match the current user and klaz.
+        user = get_current_user
+        # Get the object_role objects
+        object_roles = ObjectRole.find(:all, :conditions => { :klazz_name => klazz_name, :user_id => user.id } )
+        # Get a list of IDs. These are objects that are owned by the current_user
+        object_role_ids = object_roles.collect { |or_| or_.object_reference } # [ 1, 1, 1, 1 ]
+        # There have to be some object_roles at least.
+        unless object_roles.blank?
+          # if statement
+          if mode.eql?(:all)
+            ret = klazz.find(:all, object_role_ids)
+          elsif mode.eql?(:first)
+            ret = klazz.find(object_role_ids.first)
+          end
+        end
+      end
+
+      ret
+    end
+
+    ############################################################################
     # is_authorized?
     #
     # Checks if the corresponding role.eql?("owner")

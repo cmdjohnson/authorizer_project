@@ -101,4 +101,24 @@ class AuthorizerTest < ActionController::TestCase
     # And again
     assert_false Authorizer::Base.remove_authorization( :object => @post, :user => @user )
   end
+
+  def test_find
+    @post.destroy
+    # Check
+    assert_nil Authorizer::Base.find(:all, "Post")
+    assert_nil Authorizer::Base.find(:first, "Post")
+    # Create two posts
+    p1 = Factory.create :post
+    p2 = Factory.create :post
+    # Hello
+    Authorizer::Base.authorize_user( :object => p1 )
+    Authorizer::Base.authorize_user( :object => p2 )
+    # Now do something
+    a = Authorizer::Base.find(:all, "Post")
+    assert a.is_a?(Array)
+    assert_equal 2, a.size
+    # Another line
+    b = Authorizer::Base.find(:first, "Post")
+    assert b.is_a?(Post)
+  end
 end
