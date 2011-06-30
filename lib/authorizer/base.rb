@@ -13,7 +13,7 @@ module Authorizer
     # If no role is specified, "owner" is used as role.
     ############################################################################
 
-    def authorize_user(options)
+    def self.authorize_user(options)
       OptionsChecker.check(options, [ :object ])
 
       ret = false
@@ -28,7 +28,7 @@ module Authorizer
       object_reference = object.id
 
       unless user.nil?
-        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user => user } )
+        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => user.id } )
       end
 
       # This time, we want it to be nil.
@@ -52,7 +52,8 @@ module Authorizer
 
       ret = false
 
-      return ret if basic_check_fails?(options)
+      check = basic_check_fails?(options)
+      return ret if check
 
       object = options[:object]
       user = options[:user] || get_current_user
@@ -60,7 +61,7 @@ module Authorizer
       object_reference = object.id
 
       unless user.nil?
-        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user => user } )
+        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => user.id } )
       end
 
       # Congratulations, you've been Authorized.
@@ -121,7 +122,7 @@ module Authorizer
 
       objects = options[:objects]
 
-      current_user_id = get_current_user_id
+      current_user_id = get_current_user.id
 
       unless current_user_id.nil?
         for object in objects
@@ -152,8 +153,12 @@ module Authorizer
     protected
 
     def self.basic_check_fails?(options)
-      if !options[:object].is_a?(ActiveRecord::Base) || options[:object].new_record?
-        raise "object must be subclass of ActiveRecord::Base and must also be saved."
+      ret = false
+
+      unless options[:object].nil?
+        if !options[:object].is_a?(ActiveRecord::Base) || options[:object].new_record?
+          raise "object must be subclass of ActiveRecord::Base and must also be saved."
+        end
       end
 
       unless options[:user].nil?
