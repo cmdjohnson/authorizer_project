@@ -52,6 +52,12 @@ class AuthorizerTest < ActionController::TestCase
 
   def test_delete_auth_object_when_user_gets_deleted
     # Create some authorization
-
+    Authorizer::Base.authorize_user( :object => @post )
+    # Count
+    c = ObjectRole.count
+    # Now let's delete the user.
+    @user.destroy
+    # Checks
+    assert_equal c - 1, ObjectRole.count
   end
 end
