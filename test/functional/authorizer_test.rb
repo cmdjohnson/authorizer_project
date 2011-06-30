@@ -49,4 +49,17 @@ class AuthorizerTest < ActionController::TestCase
       assert_equal "Post", object_role.klazz_name
     end
   end
+
+  def test_authorize_a_user_to_have_access_to_an_object
+    # Set up stuff
+
+    # Invoke method
+
+    # Check result
+  end
+
+  def test_delete_auth_object_when_user_gets_deleted
+    # Create some authorization
+
+  end
 end

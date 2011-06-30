@@ -6,70 +6,104 @@
 ################################################################################
 module Authorizer
   class Base < ApplicationController
-    ##############################################################################
-    # is_authorized?
+    ############################################################################
+    # authorize_user
     #
-    # Checks if the corresponding role.eql?("owner")
-    ##############################################################################
+    # If no user is specified, authorizes the current user.
+    # If no role is specified, "owner" is used as role.
+    ############################################################################
 
-    def self.is_authorized? object
+    def authorize_user(options)
+      OptionsChecker.check(options, [ :object ])
+
       ret = false
 
-      return ret if basic_check_fails?(object)
+      object = options[:object]
+      role = options[:role] || "owner"
+      user = options[:user] || get_current_user
+
+      return false if basic_check_fails?(options)
 
       klazz_name = object.class.to_s
       object_reference = object.id
 
-      current_user_id = get_current_user_id
-
-      unless current_user_id.nil?
-        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
+      unless user.nil?
+        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user => user } )
       end
 
-      # Congratulations, you've been Authorized.
-      unless or_.blank?
+      # This time, we want it to be nil.
+      if or_.nil? && !user.nil?
+        ObjectRole.create!( :klazz_name => klazz_name, :object_reference => object_reference, :user => user, :role => role )
+        Rails.logger.debug("Authorizer: created authorization on #{object} for current_user with ID #{user.id} witih role #{role}")
         ret = true
-      end
-
-      if ret
-        Rails.logger.debug("Authorizer: authorized current_user with ID #{current_user_id} to access #{or_.description} because of role #{or_.role}")
-      else
-        Rails.logger.debug("Authorizer: authorization failed for current_user with ID #{current_user_id} to access #{object.to_s}")
       end
 
       ret
     end
 
-    ##############################################################################
+    ############################################################################
+    # user_is_authorized?
+    #
+    # If no user is specified, current_user is used.
+    ############################################################################
+
+    def self.user_is_authorized? options
+      OptionsChecker.check(options, [ :object ])
+
+      ret = false
+
+      return ret if basic_check_fails?(options)
+
+      object = options[:object]
+      user = options[:user] || get_current_user
+      klazz_name = object.class.to_s
+      object_reference = object.id
+
+      unless user.nil?
+        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user => user } )
+      end
+
+      # Congratulations, you've been Authorized.
+      unless or_.nil?
+        ret = true
+      end
+
+      if ret
+        Rails.logger.debug("Authorizer: authorized current_user with ID #{user.id} to access #{or_.description} because of role #{or_.role}")
+      else
+        Rails.logger.debug("Authorizer: authorization failed for current_user with ID #{user.id} to access #{object.to_s}")
+      end
+
+      ret
+    end
+
+    ############################################################################
+    # is_authorized?
+    #
+    # Checks if the corresponding role.eql?("owner")
+    ############################################################################
+
+    def self.is_authorized? object
+      user_is_authorized? :object => object
+    end
+
+    ############################################################################
     # create_ownership
     #
     # ObjectRole.create!( :klazz_name => object.class.to_s, :object_reference => object.id, :user => current_user, :role => "owner" )
-    ##############################################################################
+    ############################################################################
 
     def self.create_ownership object
       ret = false
 
       return ret if basic_check_fails?(object)
 
-      klazz_name = object.class.to_s
-      object_reference = object.id
-
-      current_user_id = get_current_user_id
-
-      unless current_user_id.nil?
-        or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
-      end
-
-      # This time, we want it to be nil.
-      if or_.blank? && !current_user_id.nil?
-        ObjectRole.create!( :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id, :role => "owner" )
-        Rails.logger.debug("Authorizer: created ownership of #{object} for current_user with ID #{current_user_id}")
-      end
+      ret = authorize_user( :object => object )
 
       ret
     end
 
-    ##############################################################################
+    ############################################################################
     # create_brand_new_object_roles
     #
     # For if you've been working without Authorizer and want to start using it.
@@ -80,7 +114,7 @@ module Authorizer
     # user = User.find(1)
     # objects = [ "Post", "Category" ]
     # Authorizer.create_brand_new_object_roles( :user => user, :objects => objects )
-    ##############################################################################
+    ############################################################################
 
     def self.create_brand_new_object_roles(options = {})
       OptionsChecker.check(options, [ :user, :objects ])
@@ -117,16 +151,24 @@ module Authorizer
 
     protected
 
-    def self.basic_check_fails?(object)
-      !object.is_a?(ActiveRecord::Base) || object.new_record?
+    def self.basic_check_fails?(options)
+      if !options[:object].is_a?(ActiveRecord::Base) || options[:object].new_record?
+        raise "object must be subclass of ActiveRecord::Base and must also be saved."
+      end
+
+      unless options[:user].nil?
+        raise "User object must be saved" if !options[:user].is_a?(ActiveRecord::Base) || options[:user].new_record?
+      end
+
+      ret
     end
 
-    def self.get_current_user_id
+    def self.get_current_user
       ret = nil
 
       begin
         session = UserSession.find
-        ret = session.user.id
+        ret = session.user
       rescue
       end
 
