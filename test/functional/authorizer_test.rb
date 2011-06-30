@@ -86,4 +86,19 @@ class AuthorizerTest < ActionController::TestCase
     # Check it
     assert_equal c, ObjectRole.count
   end
+
+  def test_remove_authorization
+    # count
+    c = ObjectRole.count
+    # Create some
+    Authorizer::Base.authorize_user( :object => @post )
+    # Now remove it again
+    assert Authorizer::Base.remove_authorization( :object => @post )
+    # Check it
+    assert_equal c, ObjectRole.count
+    # Try it again
+    assert_false Authorizer::Base.remove_authorization( :object => @post )
+    # And again
+    assert_false Authorizer::Base.remove_authorization( :object => @post, :user => @user )
+  end
 end

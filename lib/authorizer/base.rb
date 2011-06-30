@@ -24,13 +24,13 @@ module Authorizer
 
       return false if basic_check_fails?(options)
 
-      klazz_name = object.class.to_s
-      object_reference = object.id
-
-      or_ = find_object_role(klazz_name, object_reference, user)
+      or_ = find_object_role(object, user)
 
       # This time, we want it to be nil.
       if or_.nil? && !user.nil?
+        klazz_name = object.class.to_s
+        object_reference = object.id
+
         ObjectRole.create!( :klazz_name => klazz_name, :object_reference => object_reference, :user => user, :role => role )
         Rails.logger.debug("Authorizer: created authorization on #{object} for current_user with ID #{user.id} witih role #{role}")
         ret = true
@@ -55,10 +55,8 @@ module Authorizer
 
       object = options[:object]
       user = options[:user] || get_current_user
-      klazz_name = object.class.to_s
-      object_reference = object.id
 
-      or_ = find_object_role(klazz_name, object_reference, user)
+      or_ = find_object_role(object, user)
         
       # Congratulations, you've been Authorized.
       unless or_.nil?
@@ -69,6 +67,35 @@ module Authorizer
         Rails.logger.debug("Authorizer: authorized current_user with ID #{user.id} to access #{or_.description} because of role #{or_.role}")
       else
         Rails.logger.debug("Authorizer: authorization failed for current_user with ID #{user.id} to access #{object.to_s}")
+      end
+
+      ret
+    end
+
+    ############################################################################
+    # remove_authorization
+    ############################################################################
+    # Remove authorization a user has on a certain object.
+    ############################################################################
+
+    def self.remove_authorization options = {}
+      OptionsChecker.check(options, [ :object ])
+
+      ret = false
+
+      return ret if basic_check_fails?(options)
+
+      object = options[:object]
+      user = options[:user] || get_current_user
+
+      or_ = find_object_role(object, user)
+
+      unless or_.nil?
+        Rails.logger.debug("Authorizer: removed authorization for user ID #{user.id} on #{or_.description}")
+
+        or_.destroy
+
+        ret = true
       end
 
       ret
@@ -163,7 +190,10 @@ module Authorizer
 
     protected
 
-    def self.find_object_role(klazz_name, object_reference, user)
+    def self.find_object_role(object, user)
+      klazz_name = object.class.to_s
+      object_reference = object.id
+
       unless user.nil?
         or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => user.id } )
       end
