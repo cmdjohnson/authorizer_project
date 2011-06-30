@@ -14,7 +14,7 @@ class AuthorizerTest < ActionController::TestCase
     
     assert_false Authorizer::Base.is_authorized?(@post)
 
-    Authorizer::Base.create_ownership(@post)
+    Authorizer::Base.authorize_user( :object => @post )
 
     assert Authorizer::Base.is_authorized?(@post)
     assert_equal c + 1, ObjectRole.count
@@ -48,15 +48,6 @@ class AuthorizerTest < ActionController::TestCase
       assert_equal @user.id, object_role.user_id
       assert_equal "Post", object_role.klazz_name
     end
-  end
-
-  def test_authorize_a_user_to_have_access_to_an_object
-    # Set up stuff
-
-
-    # Invoke method
-
-    # Check result
   end
 
   def test_delete_auth_object_when_user_gets_deleted
