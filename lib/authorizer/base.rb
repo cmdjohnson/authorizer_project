@@ -146,6 +146,21 @@ module Authorizer
       end
     end
 
+    ############################################################################
+    # remove_all_unused_authorization_objects
+    #############################################################################
+    # Remove all stale (non-object) authorization objects.
+    ############################################################################
+
+    def self.remove_all_unused_authorization_objects options = {}
+      # no options
+      # ___
+      # Let's iterate all ObjectRoles
+      for object_role in ObjectRole.all
+        object_role.destroy if object_role.object.nil?
+      end
+    end
+
     protected
 
     def self.find_object_role(klazz_name, object_reference, user)

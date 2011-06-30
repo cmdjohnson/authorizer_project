@@ -44,4 +44,16 @@ class ObjectRole < ActiveRecord::Base
   def description
     "#{self.klazz_name} #{self.object_reference}"
   end
+
+  def object
+    obj = nil
+
+    begin
+      klazz = eval(self.klazz_name)
+      obj = klazz.find(self.object_reference)
+    rescue
+    end
+
+    obj
+  end
 end

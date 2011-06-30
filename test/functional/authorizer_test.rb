@@ -71,4 +71,19 @@ class AuthorizerTest < ActionController::TestCase
     # Checks
     assert_equal c - 1, ObjectRole.count
   end
+
+  def test_remove_all_unused_authorization_objects
+    # Create some stupid authorization objects
+    @post.destroy
+    # c
+    c = ObjectRole.count
+    # gogo
+    5.times do
+      Factory.create :object_role
+    end
+    # Now clean it
+    Authorizer::Base.remove_all_unused_authorization_objects
+    # Check it
+    assert_equal c, ObjectRole.count
+  end
 end
