@@ -23,12 +23,18 @@ class Authorizer < ApplicationController
     current_user_id = get_current_user_id
 
     unless current_user_id.nil?
-      or_ = ObjectRole.all( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
+      or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
     end
 
     # Congratulations, you've been Authorized.
     unless or_.blank?
       ret = true
+    end
+
+    if ret
+      Rails.logger.debug("Authorizer: authorized current_user with ID #{current_user_id} to access #{or_.description} because of role #{or_.role}")
+    else
+      Rails.logger.debug("Authorizer: authorization failed for current_user with ID #{current_user_id} to access #{object.to_s}")
     end
 
     ret
@@ -51,12 +57,13 @@ class Authorizer < ApplicationController
     current_user_id = get_current_user_id
 
     unless current_user_id.nil?
-      or_ = ObjectRole.all( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
+      or_ = ObjectRole.first( :conditions => { :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id } )
     end
 
     # This time, we want it to be nil.
     if or_.blank? && !current_user_id.nil?
       ObjectRole.create!( :klazz_name => klazz_name, :object_reference => object_reference, :user_id => current_user_id, :role => "owner" )
+      Rails.logger.debug("Authorizer: created ownership of #{object} for current_user with ID #{current_user_id}")
     end
 
     ret

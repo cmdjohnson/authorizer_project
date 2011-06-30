@@ -29,4 +29,8 @@ class ObjectRole < ActiveRecord::Base
   ##############################################################################
   # instance methods
   ##############################################################################
+
+  def description
+    "#{self.klazz_name} #{self.object_reference}"
+  end
 end
