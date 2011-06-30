@@ -1,11 +1,10 @@
 # -*- encoding : utf-8 -*-
+################################################################################
+# Authorizer
+#
+# Authorizer is a Ruby class that authorizes using the ObjectRole record.
+################################################################################
 class Authorizer < ApplicationController
-  ##############################################################################
-  # Authorizer
-  #
-  # Authorizer is a Ruby class that authorizes using the ObjectRole record.
-  ##############################################################################
-
   ##############################################################################
   # is_authorized?
   #
