@@ -1,5 +1,7 @@
 # -*- encoding : utf-8 -*-
 ActionController::Routing::Routes.draw do |map|
+  map.resources :posts
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

@@ -1,0 +1,18 @@
+%h1.heading
+  = "Posts"
+  
+%p.actions
+  = link_to 'New Post', new_resource_path
+  
+%table
+  %thead.header
+    %tr
+      %th.name= 'Name'
+      %th.title= 'Title'
+      %th.description= 'Description'
+      %th.actions= 'Actions'
+  %tbody.items.resources
+    - collection.each do |resource|
+      = render 'item', :resource => resource
+      
+= will_paginate(collection)

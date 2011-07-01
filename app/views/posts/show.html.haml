@@ -1,0 +1,15 @@
+%h1.heading
+  = "Post %s" % resource.id
+  
+- content_tag_for(:dl, resource) do
+  %dt.label= 'Name'
+  %dd.name= h resource.try(:name)
+  %dt.label= 'Title'
+  %dd.title= h resource.try(:title)
+  %dt.label= 'Description'
+  %dd.description= h resource.try(:description)
+  
+%p.actions
+  = link_to 'Edit', edit_resource_path(resource)
+  |
+  = link_to 'Index', collection_path

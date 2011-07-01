@@ -1,10 +1,6 @@
 require 'test_helper'
 
-class PostTest < ActiveRecord::TestCase
-  
-  setup do
-    
-  end
+class PostsHelperTest < ActionView::TestCase
   
   test 'something' do
     assert true
