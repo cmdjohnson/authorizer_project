@@ -3,11 +3,19 @@ class PostsController < InheritedResources::Base
   actions :index, :show, :new, :edit, :create, :update, :destroy
   respond_to :html, :js, :xml, :json
 
+  ##############################################################################
+  # begin authorizer
+  ##############################################################################
+
   # own created objects so you can access them after creation
   after_filter :own_created_object, :only => :create
   # authorize entire controller
   before_filter :authorize, :except => [ :create, :index, :new ]
-  
+
+  ##############################################################################
+  # end authorizer
+  ##############################################################################
+
   protected
     
     def collection
