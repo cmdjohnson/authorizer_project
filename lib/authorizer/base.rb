@@ -23,7 +23,7 @@ module Authorizer
 
       object = options[:object]
       role = options[:role] || "owner"
-      user = options[:user] || get_current_user
+      user = get_current_user
 
       return false if basic_check_fails?(options)
 
@@ -57,7 +57,7 @@ module Authorizer
       return ret if check
 
       object = options[:object]
-      user = options[:user] || get_current_user
+      user = get_current_user
 
       or_ = find_object_role(object, user)
         
@@ -89,7 +89,7 @@ module Authorizer
       return ret if basic_check_fails?(options)
 
       object = options[:object]
-      user = options[:user] || get_current_user
+      user = get_current_user
 
       or_ = find_object_role(object, user)
 
