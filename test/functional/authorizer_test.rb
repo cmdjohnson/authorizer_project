@@ -1,12 +1,15 @@
 # -*- encoding : utf-8 -*-
 require 'test_helper'
 
+require 'authorizer/base'
+
 # class BankTransactionsControllerTest < ActionController::TestCase
 class AuthorizerTest < ActionController::TestCase
   def setup
     setup_user # This gives you @user
     #@object_role = Factory.create :object_role
     @post = Factory.create :post
+
   end
 
   def test_trolololololol
