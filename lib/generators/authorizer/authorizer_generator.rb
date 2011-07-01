@@ -1,4 +1,4 @@
-class AuthorizerGenerator < Rails::Generator::NamedBase
+class AuthorizerGenerator < Rails::Generator::Base
   def manifest
     record do |m|
       m.migration_template 'migration:migration.rb', "db/migrate", {:assigns => my_assigns,
