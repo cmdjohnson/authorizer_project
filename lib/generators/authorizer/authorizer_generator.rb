@@ -23,7 +23,7 @@ class AuthorizerGenerator < Rails::Generator::Base
 
   def my_assigns
     returning(assigns = {}) do
-      assigns[:migration_action] = "create"
+      assigns[:migration_action] = "add"
       assigns[:class_name] = filename
       assigns[:table_name] = table_name
       assigns[:attributes] = [Rails::Generator::GeneratedAttribute.new("klazz_name", "string")]
