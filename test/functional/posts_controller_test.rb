@@ -33,6 +33,16 @@ class PostsControllerTest < ActionController::TestCase
     end
   end
 
+  def test_create_and_own
+    post :create, :post => @post.attributes
+
+    assert_equal 2, ObjectRole.count
+    o = ObjectRole.last
+    p = Post.last
+
+    assert_equal p.id, o.object.id
+  end
+
   # Standard controller tests
   
   test 'create' do
