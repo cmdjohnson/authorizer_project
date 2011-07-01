@@ -31,7 +31,7 @@ gem "authlogic", "2.1.6"
 # What it's all about
 ################################################################################
 gem "options_checker", "0.0.1"
-gem "authorizer", "0.0.1"
+#gem "authorizer", "0.0.1" # use plugin for now
 ################################################################################
 
 group :development do
