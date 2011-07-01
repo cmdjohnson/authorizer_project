@@ -1,7 +1,5 @@
 require 'test_helper'
 
-# for user_not_authorized
-require 'authorizer/exceptions'
 
 class PostsControllerTest < ActionController::TestCase
   def setup

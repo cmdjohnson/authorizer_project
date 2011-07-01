@@ -5,6 +5,10 @@
 # Authorizer is a Ruby class that authorizes using the ObjectRole record.
 ################################################################################
 
+# for user_not_authorized
+require 'authorizer/exceptions'
+require 'authorizer/application_controller'
+
 module Authorizer
   class Base < ApplicationController
     ############################################################################
@@ -65,9 +69,9 @@ module Authorizer
       end
 
       if ret
-        Rails.logger.debug("Authorizer: authorized current_user with ID #{user.id} to access #{or_.description} because of role #{or_.role}")
+        Rails.logger.debug("Authorizer: authorized current_user with ID #{user.id} to access #{or_.description} because of role #{or_.role}") unless user.nil? || or_.nil?
       else
-        Rails.logger.debug("Authorizer: authorization failed for current_user with ID #{user.id} to access #{object.to_s}")
+        Rails.logger.debug("Authorizer: authorization failed for current_user with ID #{user.id} to access #{object.to_s}") unless user.nil? || object.nil?
       end
 
       ret
@@ -232,6 +236,24 @@ module Authorizer
 
     protected
 
+    ############################################################################
+    # get_current_user
+    ############################################################################
+    # helper method to not be dependent on the current_user method
+    ############################################################################
+
+    def self.get_current_user
+      ret = nil
+
+      begin
+        session = UserSession.find
+        ret = session.user
+      rescue
+      end
+
+      ret
+    end
+
     def self.find_object_role(object, user)
       klazz_name = object.class.to_s
       object_reference = object.id
@@ -254,18 +276,6 @@ module Authorizer
 
       unless options[:user].nil?
         raise "User object must be saved" if !options[:user].is_a?(ActiveRecord::Base) || options[:user].new_record?
-      end
-
-      ret
-    end
-
-    def self.get_current_user
-      ret = nil
-
-      begin
-        session = UserSession.find
-        ret = session.user
-      rescue
       end
 
       ret
