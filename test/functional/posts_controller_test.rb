@@ -1,9 +1,39 @@
 require 'test_helper'
 
+# for user_not_authorized
+require 'authorizer/exceptions'
+
 class PostsControllerTest < ActionController::TestCase
   def setup
     @post = Factory.create :post
+    # Log in.
+    setup_user
+    # Create authorization for the user.
+    Authorizer::Base.authorize_user( :object => @post )
   end
+  
+  # Nifty tests to test Authorizer
+  
+  def test_authorization
+    # Let's remove authorization.
+    UserSession.find.destroy
+    # Attempt to access the object. Should fail.
+    assert_raise Authorizer::UserNotAuthorized do
+      get :show, :id => @post
+    end
+    # Now log in. Should work
+    UserSession.create(@user)
+    # Gogo
+    get :show, :id => @post
+    # Now delete the authorization.
+    Authorizer::Base.remove_authorization( :object => @post )
+    # Try again. Should fail.
+    assert_raise Authorizer::UserNotAuthorized do
+      get :show, :id => @post
+    end
+  end
+
+  # Standard controller tests
   
   test 'create' do
     post :create, :post => @post.attributes
