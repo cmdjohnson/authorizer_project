@@ -5,8 +5,6 @@
 # Authorizer is a Ruby class that authorizes using the ObjectRole record.
 ################################################################################
 
-require 'authorizer/exceptions'
-
 module Authorizer
   class Base < ApplicationController
     ############################################################################
