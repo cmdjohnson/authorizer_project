@@ -1,6 +1,10 @@
 # -*- encoding : utf-8 -*-
 require 'test_helper'
 
+# Authorizer
+require 'authorizer/base'
+require 'authorizer/admin'
+
 # class BankTransactionsControllerTest < ActionController::TestCase
 class AuthorizerTest < ActionController::TestCase
   def setup
@@ -59,7 +63,7 @@ class AuthorizerTest < ActionController::TestCase
     # Now let's delete the user.
     @user.destroy
     # Checks
-    assert_equal c - 1, ObjectRole.count
+    assert_equal c - 1, ObjectRole.count, "Your Observers probably aren't configured"
   end
 
   def test_delete_auth_object_when_associated_object_gets_deleted
@@ -70,7 +74,7 @@ class AuthorizerTest < ActionController::TestCase
     # Now let's delete the user.
     @post.destroy
     # Checks
-    assert_equal c - 1, ObjectRole.count
+    assert_equal c - 1, ObjectRole.count, "Your Observers probably aren't configured"
   end
 
   def test_remove_all_unused_authorization_objects
