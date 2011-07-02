@@ -59,8 +59,6 @@ end
  4. run "rake db:migrate" to migrate your database
  5. Add observers to 'config/environment.rb'
 
-require "authorizer/user_observer"
-require "authorizer/object_observer"
 config.active_record.observers = "Authorizer::UserObserver", "Authorizer::ObjectObserver"
 
 Usage
@@ -84,7 +82,7 @@ Authorizer::Base.remove_authorization(object)
  
 Find all objects that the current user is authorized to use
 
-Authorizer::Base.find(:all, "Post") # [ #<Post id: 1>, #<Post id: 2> ]
+Authorizer::Base.find(:all, "Post", :conditions => { :order => "DESC" }) # [ #<Post id: 1>, #<Post id: 2> ]
 Authorizer::Base.find(:first, "Post") #<Post id: 1>
 
 If you are using inherited_resources, you can also use these filters in your controller class:
@@ -93,6 +91,20 @@ If you are using inherited_resources, you can also use these filters in your con
 after_filter :own_created_object, :only => :create
 # authorize entire controller
 before_filter :authorize, :except => [ :create, :index, :new ]
+
+If you're just getting started with Authorizer but you already have a running app, you can have one user own all objects with this method:
+
+Authorizer::Admin.create_brand_new_object_roles(:user => User.first)
+
+This method will guess what objects to use by checking for direct descendants of ActiveRecord::Base.
+
+If you just want to do this for the Post and Category classes, use:
+
+Authorizer::Admin.create_brand_new_object_roles(:user => User.first, :objects => [ "Post", "Category" ])
+
+To get rid of any stale authorization objects lying around in your database, use:
+
+Authorizer::Admin.remove_all_unused_authorization_objects
 
 Other notes
 ===
@@ -105,6 +117,6 @@ Requirements:
 Optional:
  - inherited_resources if you want to use the controller filters supplied with this gem.
 
-Reviews, patches and bug tickets are welcome!
+Reviews, and patches are welcome!
 
-Author: Commander Johnson (yes, that's an alias. what do you think?) email: commanderjohnson gmail com
+Author: Commander Johnson email: commanderjohnson gmail com
