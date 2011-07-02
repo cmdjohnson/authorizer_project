@@ -1,8 +1,6 @@
 # -*- encoding : utf-8 -*-
 require 'test_helper'
 
-require 'authorizer/base'
-
 # class BankTransactionsControllerTest < ActionController::TestCase
 class AuthorizerTest < ActionController::TestCase
   def setup
@@ -42,7 +40,7 @@ class AuthorizerTest < ActionController::TestCase
 
     objects = [ "Post" ]
 
-    Authorizer::Base.create_brand_new_object_roles( :objects => objects, :user => @user )
+    assert Authorizer::Admin.create_brand_new_object_roles( :objects => objects, :user => @user )
 
     assert_equal 6, ObjectRole.count # WHY 6?????????????????????????????????????????????????????????
     # I don't understand factory_girl sometimes.
@@ -85,7 +83,7 @@ class AuthorizerTest < ActionController::TestCase
       Factory.create :object_role
     end
     # Now clean it
-    Authorizer::Base.remove_all_unused_authorization_objects
+    Authorizer::Admin.remove_all_unused_authorization_objects
     # Check it
     assert_equal c, ObjectRole.count
   end
