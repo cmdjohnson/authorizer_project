@@ -110,9 +110,18 @@ module Authorizer
     # find
     ############################################################################
     # Out of the collection of all Posts, return the subset that belongs to the current user.
+    # Use :conditions => { :order => "ASC" } to specify additional SQL conditions.
     ############################################################################
 
-    def self.find(mode, klazz_name)
+    def self.find(options = {})
+      # Options
+      OptionsChecker.check(options, [ :mode, :klazz_name ])
+
+      # assign
+      mode = options[:mode]
+      klazz_name = options[:klazz_name]
+      custom_conditions = options[:conditions] || {}
+
       # rrrr
       ret = nil
       # Checks
@@ -130,7 +139,9 @@ module Authorizer
         # let's find the object_role objects that match the current user and klaz.
         user = get_current_user
         # Get the object_role objects
-        object_roles = ObjectRole.find(:all, :conditions => { :klazz_name => klazz_name, :user_id => user.id } )
+        leading_conditions = { :klazz_name => klazz_name, :user_id => user.id }
+        conditions = custom_conditions.merge(leading_conditions)
+        object_roles = ObjectRole.find(:all, :conditions => conditions )
         # Get a list of IDs. These are objects that are owned by the current_user
         object_role_ids = object_roles.collect { |or_| or_.object_reference } # [ 1, 1, 1, 1 ]
         # There have to be some object_roles at least.
@@ -171,67 +182,6 @@ module Authorizer
       ret = authorize_user( :object => object )
 
       ret
-    end
-
-    ############################################################################
-    # create_brand_new_object_roles
-    #
-    # For if you've been working without Authorizer and want to start using it.
-    # Obviously, if you don't have any ObjectRoles then you'll find yourself blocked out of your own app.
-    # This method will assign all objects listed in an array to a certain user.
-    # For instance:
-    #
-    # user = User.find(1)
-    # objects = [ "Post", "Category" ]
-    # Authorizer.create_brand_new_object_roles( :user => user, :objects => objects )
-    ############################################################################
-
-    def self.create_brand_new_object_roles(options = {})
-      OptionsChecker.check(options, [ :user, :objects ])
-
-      objects = options[:objects]
-
-      current_user_id = get_current_user.id
-
-      unless current_user_id.nil?
-        for object in objects
-          evaled_klazz = nil
-
-          begin
-            evaled_klazz = eval(object)
-          rescue
-          end
-
-          unless evaled_klazz.nil?
-            # Let's find all. This is the same as Post.all
-            if evaled_klazz.is_a?(Class)
-              collection = evaled_klazz.all
-
-              # Go
-              unless collection.blank?
-                for coll_ in collection
-                  ObjectRole.create!( :klazz_name => object, :object_reference => coll_.id, :user_id => current_user_id, :role => "owner" )
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-
-    ############################################################################
-    # remove_all_unused_authorization_objects
-    #############################################################################
-    # Remove all stale (non-object) authorization objects.
-    ############################################################################
-
-    def self.remove_all_unused_authorization_objects options = {}
-      # no options
-      # ___
-      # Let's iterate all ObjectRoles
-      for object_role in ObjectRole.all
-        object_role.destroy if object_role.object.nil?
-      end
     end
 
     protected

@@ -24,8 +24,16 @@ class ApplicationController < ActionController::Base
   def own_created_object
     ret = true # always return true otherwise the filter chain would be blocked.
 
-    unless resource.nil?
-      Authorizer::Base.authorize_user( :object => resource )
+    begin
+      r = resource
+    rescue
+    end
+
+    unless r.nil?
+      # only if this objet was successfully created will we do this.
+      unless r.new_record?
+        Authorizer::Base.authorize_user( :object => r )
+      end
     end
 
     ret
@@ -34,8 +42,13 @@ class ApplicationController < ActionController::Base
   def authorize
     ret = false # return false by default, effectively using a whitelist method.
 
-    unless resource.nil?
-      auth = Authorizer::Base.user_is_authorized?( :object => resource )
+    begin
+      r = resource
+    rescue      
+    end
+
+    unless r.nil?
+      auth = Authorizer::Base.user_is_authorized?( :object => r )
 
       if auth.eql?(false)
         raise Authorizer::UserNotAuthorized.new("You are not authorized to access this resource.")

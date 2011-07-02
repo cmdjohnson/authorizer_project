@@ -43,6 +43,7 @@ doc\:clobber_rails=Remove rdoc products
 doc\:guides=Generate Rails guides
 doc\:plugins=Generate documentation for all installed plugins
 doc\:plugins\:application_config=Generate documentation for the application_config plugin
+doc\:plugins\:authorizer=Generate documentation for the authorizer plugin
 doc\:plugins\:iso-3166-country-select=Generate documentation for the iso-3166-country-select plugin
 doc\:plugins\:validation_reflection=Generate documentation for the validation_reflection plugin
 doc\:rails=Build the RDOC HTML Files

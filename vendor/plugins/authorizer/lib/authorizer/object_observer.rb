@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module Authorizer
   # Observes users and deleted any associated ObjectRole objects when the user gets deleted.
   class ObjectObserver < ActiveRecord::Observer
