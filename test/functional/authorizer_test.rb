@@ -138,5 +138,11 @@ class AuthorizerTest < ActionController::TestCase
     options[:find_options] = { :limit => 1 }
     d = Authorizer::Base.find(options)
     assert_equal 1, d.size
+    # More
+    options[:mode] = :id
+    options[:find_options] = nil
+    options[:find_ids] = [ p1.id, p2.id ]
+    e = Authorizer::Base.find(options)
+    assert_equal 2, e.size
   end
 end
