@@ -109,11 +109,14 @@ class AuthorizerTest < ActionController::TestCase
 
   def test_find
     @post.destroy
-    options = { :mode => :all, :klazz_name => "Post" }
     # Check
-    assert_nil Authorizer::Base.find(options)
-    options[:mode] = :first
-    assert_nil Authorizer::Base.find(options)
+    array = Authorizer::Base.find("Post", :all)
+    assert array.is_a?(Array)
+    assert_equal 0, array.size
+
+    assert_raise ActiveRecord::RecordNotFound do
+      Authorizer::Base.find("Post", :first)
+    end
     # Create two posts
     p1 = Factory.create :post
     p2 = Factory.create :post
@@ -121,28 +124,22 @@ class AuthorizerTest < ActionController::TestCase
     Authorizer::Base.authorize_user( :object => p1 )
     Authorizer::Base.authorize_user( :object => p2 )
     # Now do something
-    options[:mode] = :all
-    a = Authorizer::Base.find(options)
+    a = Authorizer::Base.find("Post", :all)
     assert a.is_a?(Array)
     assert_equal 2, a.size
     # Another line
-    options[:mode] = :first
-    b = Authorizer::Base.find(options)
+    b = Authorizer::Base.find("Post", :first)
     assert b.is_a?(Post)
     # 1 more line
-    options[:mode] = :last
-    c = Authorizer::Base.find(options)
+    c = Authorizer::Base.find("Post", :last)
     assert c.is_a?(Post)
-    # anoter one
-    options[:mode] = :all
-    options[:find_options] = { :limit => 1 }
-    d = Authorizer::Base.find(options)
+    # another one
+    find_options = { :limit => 1 }
+    d = Authorizer::Base.find("Post", :all, find_options, { :user => @user })
     assert_equal 1, d.size
     # More
-    options[:mode] = :id
-    options[:find_options] = nil
-    options[:find_ids] = [ p1.id, p2.id ]
-    e = Authorizer::Base.find(options)
+    find_ids = [ p1.id, p2.id, 999, 888, 777 ] # These last 3 shouldn't be a problem at all, since they're not in the list of authorized Posts.
+    e = Authorizer::Base.find("Post", find_ids)
     assert_equal 2, e.size
   end
 end
