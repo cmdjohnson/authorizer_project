@@ -109,9 +109,11 @@ class AuthorizerTest < ActionController::TestCase
 
   def test_find
     @post.destroy
+    options = { :mode => :all, :klazz_name => "Post" }
     # Check
-    assert_nil Authorizer::Base.find(:mode => :all, :klazz_name => "Post")
-    assert_nil Authorizer::Base.find(:mode => :first, :klazz_name => "Post")
+    assert_nil Authorizer::Base.find(options)
+    options[:mode] = :first
+    assert_nil Authorizer::Base.find(options)
     # Create two posts
     p1 = Factory.create :post
     p2 = Factory.create :post
@@ -119,14 +121,22 @@ class AuthorizerTest < ActionController::TestCase
     Authorizer::Base.authorize_user( :object => p1 )
     Authorizer::Base.authorize_user( :object => p2 )
     # Now do something
-    a = Authorizer::Base.find(:mode => :all, :klazz_name => "Post")
+    options[:mode] = :all
+    a = Authorizer::Base.find(options)
     assert a.is_a?(Array)
     assert_equal 2, a.size
     # Another line
-    b = Authorizer::Base.find(:mode => :first, :klazz_name => "Post")
+    options[:mode] = :first
+    b = Authorizer::Base.find(options)
     assert b.is_a?(Post)
     # 1 more line
-    c = Authorizer::Base.find(:mode => :last, :klazz_name => "Post")
+    options[:mode] = :last
+    c = Authorizer::Base.find(options)
     assert c.is_a?(Post)
+    # anoter one
+    options[:mode] = :all
+    options[:find_options] = { :limit => 1 }
+    d = Authorizer::Base.find(options)
+    assert_equal 1, d.size
   end
 end
