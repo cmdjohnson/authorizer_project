@@ -10,7 +10,7 @@ class PostsController < InheritedResources::Base
   # own created objects so you can access them after creation
   after_filter :own_created_object, :only => :create
   # authorize entire controller
-  before_filter :authorize, :except => [ :create, :index, :new ]
+  before_filter :authorize, :only => [ :show, :edit, :update, :destroy ]
 
   ##############################################################################
   # end authorizer
