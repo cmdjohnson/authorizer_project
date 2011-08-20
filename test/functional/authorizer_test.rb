@@ -111,12 +111,10 @@ class AuthorizerTest < ActionController::TestCase
     @post.destroy
     # Check
     array = Authorizer::Base.find("Post", :all)
-    assert array.is_a?(Array)
+    assert_equal Array, array.class
     assert_equal 0, array.size
 
-    assert_raise ActiveRecord::RecordNotFound do
-      Authorizer::Base.find("Post", :first)
-    end
+    assert_equal nil, Authorizer::Base.find("Post", :first)
     # Create two posts
     p1 = Factory.create :post
     p2 = Factory.create :post
@@ -142,8 +140,10 @@ class AuthorizerTest < ActionController::TestCase
     d = Authorizer::Base.find("Post", :all, find_options, { :user => @user })
     assert_equal 1, d.size
     # More
-    find_ids = [ p1.id, p2.id, 999, 888, 777 ] # These last 3 shouldn't be a problem at all, since they're not in the list of authorized Posts.
-    e = Authorizer::Base.find("Post", find_ids)
-    assert_equal 2, e.size
+    find_ids = [ p1.id, p2.id, 999, 888, 777 ]
+    assert_raise ActiveRecord::RecordNotFound do
+      e = Authorizer::Base.find("Post", find_ids)
+      assert_equal 2, e.size
+    end
   end
 end

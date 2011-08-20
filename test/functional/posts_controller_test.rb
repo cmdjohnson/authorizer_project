@@ -16,7 +16,7 @@ class PostsControllerTest < ActionController::TestCase
     # Let's remove authorization.
     UserSession.find.destroy
     # Attempt to access the object. Should fail because we don't supply a User objet.
-    assert_raise RuntimeError do
+    assert_raise ArgumentError do
       get :show, :id => @post
     end
     # Now log in. Should work
