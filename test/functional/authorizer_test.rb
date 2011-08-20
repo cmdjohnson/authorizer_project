@@ -123,6 +123,10 @@ class AuthorizerTest < ActionController::TestCase
     # Hello
     Authorizer::Base.authorize_user( :object => p1 )
     Authorizer::Base.authorize_user( :object => p2 )
+    # Create a different user
+    user2 = Factory.create(:user)
+    num_objects_user2 = Authorizer::Base.find("Post", :all, nil, :user => user2)
+    assert_equal 0, num_objects_user2.size
     # Now do something
     a = Authorizer::Base.find("Post", :all)
     assert a.is_a?(Array)
