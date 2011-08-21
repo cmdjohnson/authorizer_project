@@ -3,6 +3,21 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  ##############################################################################
+  # authorizer
+  ##############################################################################
+
+  require 'authorizer/exceptions'
+
+  rescue_from Authorizer::UserNotAuthorized do |exception|
+    # Show a static 403 page upon authorization failure
+    render :file => "#{Rails.root}/public/403.html", :status => 403
+  end
+
+  ##############################################################################
+  # end authorizer
+  ##############################################################################
+
   helper :all
 
   helper_method :current_user_session, :current_user

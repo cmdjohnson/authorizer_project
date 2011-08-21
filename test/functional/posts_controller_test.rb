@@ -1,6 +1,5 @@
 require 'test_helper'
 
-
 class PostsControllerTest < ActionController::TestCase
   def setup
     @post = Factory.create :post
@@ -16,7 +15,7 @@ class PostsControllerTest < ActionController::TestCase
     # Let's remove authorization.
     UserSession.find.destroy
     # Attempt to access the object. Should fail because we don't supply a User objet.
-    assert_raise ArgumentError do
+    assert_raise Authorizer::RuntimeException do
       get :show, :id => @post
     end
     # Now log in. Should work
@@ -26,9 +25,13 @@ class PostsControllerTest < ActionController::TestCase
     # Now delete the authorization.
     Authorizer::Base.remove_authorization( :object => @post )
     # Try again. Should fail.
-    assert_raise Authorizer::UserNotAuthorized do
-      get :show, :id => @post
-    end
+    #    assert_raise Authorizer::UserNotAuthorized do
+    #      get :show, :id => @post
+    #    end
+    # The exception should be caught by ApplicationController and return status
+    # 403 forbidden instead.
+    get :show, :id => @post
+    assert_response 403
   end
 
   def test_create_and_own
