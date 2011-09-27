@@ -11,7 +11,45 @@ class AuthorizerTest < ActionController::TestCase
     setup_user # This gives you @user
     #@object_role = Factory.create :object_role
     @post = Factory.create :post
-
+  end
+  
+  def test_count
+    count = 5
+    
+    count.times do 
+      post = Factory.create :post
+      Authorizer::Base.authorize_user :object => post
+    end
+    
+    assert_equal count, Authorizer::Base.count("Post")
+  end
+  
+  def test_authorize_user_block
+    Authorizer::Base.authorize_user do
+      @post
+    end
+    
+    assert Authorizer::Base.is_authorized?(@post)
+  end
+  
+  def test_single_table_inheritance
+    # Let's go, authorize it!
+    Authorizer::Base.authorize_user( :object => @post )
+    assert Authorizer::Base.is_authorized?(@post)
+    
+    # Rails implements STI using the 'type' column.
+    
+    # Use the Rant class (subclass of Post) for testing.
+    @post.type = "Rant"
+    @post.save!
+    # rant is the same object but with a fresh pointer
+    rant = Rant.find(@post.id)
+    # asserts
+    assert rant.is_a?(Rant)
+    assert rant.is_a?(Post)
+    # Now for the hard part.
+    # The object should still be authorized.
+    assert Authorizer::Base.is_authorized?(rant), "Type switches are not detected by Authorizer. Maybe your Observers are not set up?"
   end
 
   def test_trolololololol
