@@ -21,12 +21,14 @@ class AuthorizerTest < ActionController::TestCase
       Authorizer::Base.authorize_user :object => post
     end
     
-    assert_equal count, Authorizer::Base.count("Post")
+    assert_equal count, Authorizer::Base.count("Post"), "Authorizer doesn't have a count method."
   end
   
   def test_authorize_user_block
-    Authorizer::Base.authorize_user do
-      @post
+    assert_nothing_raised "authorize_user doesn't accept a block" do 
+      Authorizer::Base.authorize_user do
+        @post
+      end
     end
     
     assert Authorizer::Base.is_authorized?(@post)
