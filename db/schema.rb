@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(:version => 20110629181411) do
   end
 
   create_table "posts", :force => true do |t|
+    t.string   "type"
     t.string   "name"
     t.string   "title"
     t.text     "description"
