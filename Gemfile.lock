@@ -13,7 +13,7 @@ GEM
     activesupport (2.3.12)
     authlogic (2.1.6)
       activesupport
-    authorizer (0.0.3)
+    authorizer (0.0.4)
       options_checker (>= 0.0.1)
     cgi_multipart_eof_fix (2.5.0)
     daemons (1.1.4)
@@ -62,7 +62,7 @@ PLATFORMS
 
 DEPENDENCIES
   authlogic (= 2.1.6)
-  authorizer (= 0.0.3)
+  authorizer (= 0.0.4)
   dry_scaffold (~> 0.3.8)
   factory_girl (= 1.3.2)
   formtastic (= 1.1.0)
