@@ -29,4 +29,14 @@ class AuthorizerTest < ActiveRecord::TestCase
     
     assert_equal 2, f.count
   end
+  
+  def test_find_with_non_string_class_name
+  	@post = Factory.create :post
+  	
+  	Authorizer::Base.authorize_user :object => @post
+  	
+  	ret = Authorizer::Base.find(Post, :first)
+  	
+  	assert_not_nil ret
+  end
 end

@@ -1,5 +1,5 @@
 source :gemcutter
-gem "rails", "= 2.3.12"
+gem "rails", "= 2.3.14"
 
 # bundler requires these gems in all environments
 ################################################################################
@@ -33,7 +33,7 @@ gem "ruby-prof"
 # What it's all about
 ################################################################################
 gem "options_checker", "0.0.1"
-gem "authorizer", "0.0.4"
+gem "authorizer", "0.0.5"
 ################################################################################
 
 group :development do
