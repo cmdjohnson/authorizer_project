@@ -39,4 +39,15 @@ class AuthorizerTest < ActiveRecord::TestCase
   	
   	assert_not_nil ret
   end
+  
+  def test_find_user_for_object
+    @post = Factory.create :post
+  	
+  	Authorizer::Base.authorize_user :object => @post
+  	
+    ret = Authorizer::Base.find_user_for_object(@post)
+    
+    assert_not_nil ret
+    assert_equal @post.id, ret.id
+  end
 end
